@@ -1,0 +1,16 @@
+# Adicione estas variáveis ao seu arquivo .env
+
+# Habilitar BullMQ para gerenciar timeouts de tasks
+USE_BULLMQ=true
+
+# Opção 1: URL Pública do Redis (Railway - Recomendado)
+REDIS_PUBLIC_URL=redis://default:xpfEDUlxXOoYGrMVGMNZIQdpxVxLoITc@switchback.proxy.rlwy.net:59668
+
+# Opção 2: URL Interna do Redis (Railway - Para uso interno)
+REDIS_URL=redis://default:xpfEDUlxXOoYGrMVGMNZIQdpxVxLoITc@redis.railway.internal:6379
+
+# Opção 3: Configuração Separada (Fallback)
+REDIS_HOST=redis.railway.internal
+REDIS_PORT=6379
+REDIS_PASSWORD=xpfEDUlxXOoYGrMVGMNZIQdpxVxLoITc
+REDIS_USER=default

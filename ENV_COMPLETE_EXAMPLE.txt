@@ -1,0 +1,81 @@
+# ============================================
+# CONFIGURAÇÃO DO BACKEND - HIPER SELECT
+# ============================================
+
+# Porta do servidor backend (3001 é padrão, 3000 é do Next.js)
+PORT=3001
+
+# ============================================
+# SUPABASE (PostgreSQL)
+# ============================================
+# URL do projeto Supabase
+SUPABASE_URL=https://ooancmvihrxzgtegvmwn.supabase.co
+
+# Service Role Key do Supabase (chave de administrador)
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vYW5jbXZpaHJ4emd0ZWd2bXduIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2OTY5OTk1MywiZXhwIjoyMDg1Mjc1OTUzfQ.jJ58G3rKuyiwB2ktw_QQE_4aojc2csOqVtSmLzowGbQ
+
+# ============================================
+# OPENAI (IA - Router, Executor, Humanizer)
+# ============================================
+# Chave da API OpenAI (deve começar com "sk-")
+OPENAI_API_KEY=sk-your-openai-api-key-here
+
+# ============================================
+# REDIS (BullMQ - Gerenciamento de Tasks)
+# ============================================
+# Habilitar BullMQ para gerenciar timeouts de tasks
+USE_BULLMQ=true
+
+# Opção 1: URL Pública do Redis (Recomendado para produção)
+REDIS_PUBLIC_URL=redis://default:xpfEDUlxXOoYGrMVGMNZIQdpxVxLoITc@switchback.proxy.rlwy.net:59668
+
+# Opção 2: URL Interna do Redis (Para uso interno)
+# REDIS_URL=redis://default:xpfEDUlxXOoYGrMVGMNZIQdpxVxLoITc@redis.railway.internal:6379
+
+# Opção 3: Configuração Separada (Fallback se URLs não estiverem disponíveis)
+# REDIS_HOST=redis.railway.internal
+# REDIS_PORT=6379
+# REDIS_PASSWORD=xpfEDUlxXOoYGrMVGMNZIQdpxVxLoITc
+# REDIS_USER=default
+
+# ============================================
+# WHATSAPP
+# ============================================
+# Caminho onde as sessões do WhatsApp serão salvas (se usar cache de arquivo)
+WHATSAPP_SESSION_PATH=./sessions
+
+# ============================================
+# CACHE HÍBRIDO WHATSAPP (RAM -> Redis -> Supabase)
+# ============================================
+# Ativar cache híbrido para autenticação do WhatsApp
+# Quando ativado, as credenciais são salvas em:
+# 1. Memória RAM (mais rápido)
+# 2. Redis (cache intermediário com TTL)
+# 3. Supabase (persistência final)
+USE_HYBRID_AUTH_CACHE=true
+
+# ============================================
+# CACHE DE MEMÓRIA (Conversas)
+# ============================================
+# Habilitar cache de memória para conversas (default: true)
+MEMORY_CACHE_ENABLED=true
+
+# Tempo de vida do cache em segundos (default: 60)
+MEMORY_CACHE_TTL_SECONDS=60
+
+# ============================================
+# JWT (Autenticação)
+# ============================================
+# Chave secreta para assinar tokens JWT
+# IMPORTANTE: Use uma chave forte e única em produção
+JWT_SECRET=your-super-secret-jwt-key-change-in-production
+
+# ============================================
+# NOTAS IMPORTANTES
+# ============================================
+# 1. NUNCA commite este arquivo no Git (deve estar no .gitignore)
+# 2. Para produção, use variáveis de ambiente do servidor/hosting
+# 3. A SUPABASE_SERVICE_ROLE_KEY tem acesso total ao banco - mantenha segura
+# 4. A OPENAI_API_KEY é necessária para o funcionamento da IA
+# 5. O Redis é necessário apenas se USE_BULLMQ=true
+# 6. O cache híbrido requer Redis + Supabase configurados
