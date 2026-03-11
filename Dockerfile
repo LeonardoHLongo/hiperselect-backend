@@ -1,23 +1,17 @@
-FROM node:20-alpine AS builder
-
-WORKDIR /app
-
-COPY package.json package-lock.json* ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
 FROM node:20-alpine
 
 WORKDIR /app
 
+# Copiar arquivos de dependências
 COPY package.json package-lock.json* ./
-RUN npm ci --production
 
-COPY --from=builder /app/dist ./dist
+# Instalar todas as dependências (incluindo devDependencies para ter tsx)
+RUN npm ci
+
+# Copiar código fonte
+COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "dist/bootstrap/index.js"]
-
+# Rodar com tsx diretamente (sem build)
+CMD ["npm", "run", "start"]

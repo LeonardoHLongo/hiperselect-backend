@@ -2,11 +2,11 @@
   "name": "hiperselect-backend",
   "version": "1.0.0",
   "description": "AI-driven customer support platform - Backend",
-  "main": "dist/bootstrap/index.js",
+  "main": "src/bootstrap/index.ts",
   "scripts": {
     "dev": "tsx watch src/bootstrap/index.ts",
-    "build": "tsc",
-    "start": "node dist/bootstrap/index.js",
+    "build": "echo \"Skipping TypeScript build (tsc) in Docker\"",
+    "start": "tsx src/bootstrap/index.ts",
     "type-check": "tsc --noEmit"
   },
   "keywords": [],
