@@ -83,27 +83,22 @@ export const wirePipelineHandlers = (deps: PipelineHandlersDependencies): void =
     });
     
     try {
-      // Verificação de conexão (agora getConnectionStatus já verifica socket internamente)
-      const status = whatsAppAdapter.getConnectionStatus();
-      if (status.status !== 'connected') {
-        logger.warning('WhatsApp não conectado - resposta não enviada', { 
-          status: status.status,
-          error: status.error,
-        });
-        return;
-      }
-
       let phoneNumber = event.conversationId;
       if (phoneNumber.includes('@')) {
         phoneNumber = phoneNumber.split('@')[0];
       }
 
-      logger.whatsapp('Enviando resposta via WhatsApp', {
+      // Log diagnóstico do estado do WhatsApp antes de enviar
+      const debugStatus = whatsAppAdapter.getConnectionStatus();
+      logger.whatsapp('📤 Tentando enviar resposta da IA via WhatsApp', {
         to: phoneNumber,
         traceId,
         preview: event.response.text.substring(0, 50),
+        connectionStatus: debugStatus.status,
       });
 
+      // Enviar diretamente — sendMessage() valida o socket internamente
+      // Se não estiver conectado, lança erro e o catch abaixo captura
       const messageId = await whatsAppAdapter.sendMessage(phoneNumber, event.response.text);
       
       // Marcar como enviado APÓS sucesso
@@ -116,18 +111,20 @@ export const wirePipelineHandlers = (deps: PipelineHandlersDependencies): void =
         entries.slice(-500).forEach(key => sentMessages.add(key));
       }
       
-      logger.success('Resposta enviada com sucesso', { 
+      logger.success('✅ Resposta da IA enviada com sucesso via WhatsApp', { 
         messageId,
         conversationId: event.conversationId,
         traceId,
         idempotencyKey,
       });
     } catch (error) {
-      logger.error('Erro ao enviar resposta', { 
-        error: error instanceof Error ? error.message : String(error),
+      const errMsg = error instanceof Error ? error.message : String(error);
+      logger.error('❌ Erro ao enviar resposta da IA via WhatsApp', { 
+        error: errMsg,
         stack: error instanceof Error ? error.stack : undefined,
         traceId,
         idempotencyKey,
+        conversationId: event.conversationId,
       });
       // NÃO marcar como enviado se houve erro (permite retry)
     }
