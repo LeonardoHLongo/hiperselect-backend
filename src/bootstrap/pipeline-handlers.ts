@@ -83,9 +83,13 @@ export const wirePipelineHandlers = (deps: PipelineHandlersDependencies): void =
     });
     
     try {
+      // Verificação de conexão (agora getConnectionStatus já verifica socket internamente)
       const status = whatsAppAdapter.getConnectionStatus();
       if (status.status !== 'connected') {
-        logger.warning('WhatsApp não conectado - resposta não enviada', { status: status.status });
+        logger.warning('WhatsApp não conectado - resposta não enviada', { 
+          status: status.status,
+          error: status.error,
+        });
         return;
       }
 

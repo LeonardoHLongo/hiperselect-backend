@@ -151,8 +151,12 @@ class WhatsAppAdapter {
     status: 'connected' | 'disconnected' | 'connecting' | 'error';
     error?: string;
   } {
+    // Verificação mais robusta: se o socket existe e está autenticado, considerar conectado
+    const isActuallyConnected = this.socket && this.socket.user;
+    const effectiveStatus = isActuallyConnected ? 'connected' : this.connectionStatus;
+    
     return {
-      status: this.connectionStatus,
+      status: effectiveStatus as 'connected' | 'disconnected' | 'connecting' | 'error',
       error: this.connectionError || undefined,
     };
   }
