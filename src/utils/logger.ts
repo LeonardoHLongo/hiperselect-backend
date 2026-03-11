@@ -133,27 +133,27 @@ class Logger {
     return `${this.colors.dim}${time}${this.colors.reset} ${color}${emojiStr}${prefixStr}${message}${this.colors.reset}`;
   }
 
-  info(message: string, options?: Omit<LogOptions, 'level'>): void {
+  info(message: string, options?: any): void {
     if (!this.shouldLog(options, message)) return;
     console.log(this.formatMessage(message, { ...options, level: 'info' }));
   }
 
-  success(message: string, options?: Omit<LogOptions, 'level'>): void {
+  success(message: string, options?: any): void {
     if (!this.shouldLog(options, message)) return;
     console.log(this.formatMessage(message, { ...options, level: 'success' }));
   }
 
-  warning(message: string, options?: Omit<LogOptions, 'level'>): void {
+  warning(message: string, options?: any): void {
     if (!this.shouldLog(options, message)) return;
     console.log(this.formatMessage(message, { ...options, level: 'warning' }));
   }
 
-  error(message: string, options?: Omit<LogOptions, 'level'>): void {
+  error(message: string, options?: any): void {
     if (!this.shouldLog(options, message)) return;
     console.error(this.formatMessage(message, { ...options, level: 'error' }));
   }
 
-  debug(message: string, options?: Omit<LogOptions, 'level'>): void {
+  debug(message: string, options?: any): void {
     if (!this.shouldLog(options, message)) return;
     console.log(this.formatMessage(message, { ...options, level: 'debug' }));
   }
