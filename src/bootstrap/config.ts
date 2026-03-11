@@ -93,9 +93,15 @@ export const loadConfig = (): Config => {
 
   const finalOpenaiApiKey = openaiApiKey && openaiApiKey.trim().length > 0 ? openaiApiKey.trim() : undefined;
 
+  // No Railway/Docker, usar caminho absoluto dentro do container
+  // Em desenvolvimento local, pode usar caminho relativo
+  const defaultSessionPath = process.env.NODE_ENV === 'production' 
+    ? '/app/sessions'  // Caminho absoluto no container
+    : './sessions';     // Caminho relativo em desenvolvimento
+  
   return {
     port,
-    whatsappSessionPath: process.env.WHATSAPP_SESSION_PATH || './sessions',
+    whatsappSessionPath: process.env.WHATSAPP_SESSION_PATH || defaultSessionPath,
     usePostgres,
     openaiApiKey: finalOpenaiApiKey,
     memoryCacheEnabled,
