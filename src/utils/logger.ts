@@ -10,6 +10,7 @@ interface LogOptions {
   emoji?: string;
   prefix?: string;
   timestamp?: boolean;
+  [key: string]: any; // Permitir propriedades extras para compatibilidade
 }
 
 class Logger {
