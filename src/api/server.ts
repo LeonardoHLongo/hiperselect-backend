@@ -158,11 +158,12 @@ export const createServer = async (deps: ServerDependencies): Promise<FastifyIns
   fastify.setNotFoundHandler((request, reply) => {
     // Ignorar requisições do Next.js (webpack-hmr, etc)
     if (request.url.startsWith('/_next/') || request.url.startsWith('/favicon.ico')) {
-      return reply.code(404).send({
+      reply.code(404).send({
         success: false,
         message: 'Not found (Next.js route)',
         errorCode: 'NOT_FOUND',
       });
+      return;
     }
     
     console.error('\n=== 404 NOT FOUND ===');

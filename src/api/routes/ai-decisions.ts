@@ -10,7 +10,7 @@ export const registerAIDecisionRoutes = (fastify: FastifyInstance): void => {
       return {
         success: true,
         data: decisions.map((event) => ({
-          ...event.payload,
+          ...(typeof event.payload === 'object' && event.payload !== null ? event.payload : {}),
           timestamp: event.timestamp,
           traceId: event.traceId,
         })),

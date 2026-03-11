@@ -42,8 +42,8 @@ REGRA CRÍTICA: Retorne APENAS o texto corrigido, SEM aspas duplas ou simples no
         system: systemPrompt,
         prompt: `Corrija os erros gramaticais, de digitação e de pontuação do seguinte texto, mantendo o tom original. Retorne APENAS o texto corrigido, sem aspas:\n\n${body.text}`,
         temperature: 0.3, // Baixa temperatura para correções mais consistentes
-        maxTokens: 500 as any, // Type assertion para compatibilidade com versão do SDK
-      });
+        // maxTokens removido - não suportado nesta versão do SDK
+      } as any);
 
       const correctedText = result.text.trim();
 

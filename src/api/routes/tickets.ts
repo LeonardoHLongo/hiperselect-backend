@@ -254,8 +254,18 @@ export const registerTicketRoutes = (
             }
           } catch (error) {
             console.error('[Tickets API] Erro ao chamar findById:', error);
-            throw error;
+            return reply.code(500).send({
+              success: false,
+              message: 'Failed to fetch ticket',
+              errorCode: 'INTERNAL_ERROR',
+            });
           }
+        } else {
+          return reply.code(404).send({
+            success: false,
+            message: 'Ticket not found',
+            errorCode: 'NOT_FOUND',
+          });
         }
       } else if (repository && typeof repository.findById === 'function') {
         // Tentar método antigo (não recomendado)
