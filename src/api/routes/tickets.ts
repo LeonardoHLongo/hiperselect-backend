@@ -312,7 +312,7 @@ export const registerTicketRoutes = (
         };
       } else {
         // Fallback para método antigo
-        const tickets = ticketService.getByConversationId(conversationId);
+        const tickets = await ticketService.getByConversationId(conversationId, tenantId);
         return {
           success: true,
           data: tickets,
@@ -400,7 +400,12 @@ export const registerTicketRoutes = (
       }
 
       // Usar TicketService.updateTicket que cria logs automaticamente
-      const updatedTicket = await ticketService.updateTicket(id, updates, tenantId, userId);
+      // Garantir que status seja do tipo correto
+      const typedUpdates = {
+        ...updates,
+        status: updates.status as 'open' | 'in_progress' | 'closed' | undefined,
+      };
+      const updatedTicket = await ticketService.updateTicket(id, typedUpdates, tenantId, userId);
       
       return {
         success: true,

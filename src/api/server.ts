@@ -31,7 +31,9 @@ type ServerDependencies = {
   ticketService?: TicketService;
 };
 
-export const createServer = async (deps: ServerDependencies): Promise<Fastify.FastifyInstance> => {
+import type { FastifyInstance } from 'fastify';
+
+export const createServer = async (deps: ServerDependencies): Promise<FastifyInstance> => {
   const fastify = Fastify({
     logger: false, // Desabilitar logger do Fastify completamente (fazemos logging manual apenas para requests essenciais)
   });
@@ -251,7 +253,7 @@ export const createServer = async (deps: ServerDependencies): Promise<Fastify.Fa
     eventBus.on('whatsapp.connection.status', (payload: { status: 'connected' | 'disconnected' | 'connecting' | 'error'; error?: string }) => {
       console.log('[Server] 📡 Evento de status do WhatsApp recebido, propagando via SSE:', payload);
       broadcastWhatsAppStatus({
-        status: payload.status,
+        status: payload.status as 'connected' | 'disconnected' | 'connecting' | 'error',
         reason: payload.error || (payload.status === 'error' ? 'connection_error' : undefined),
         error: payload.error,
       });
@@ -261,9 +263,13 @@ export const createServer = async (deps: ServerDependencies): Promise<Fastify.Fa
     fastify.ready().then(() => {
       console.log('\n[Server] 📋 Registered routes:');
       const routes = fastify.printRoutes();
-      console.log(routes);
+      if (routes && typeof routes.then === 'function') {
+        routes.then((r: any) => console.log(r)).catch((err: any) => console.error('[Server] Error listing routes:', err));
+      } else {
+        console.log(routes);
+      }
       console.log('\n[Server] ✅ Server ready and listening for requests');
-    }).catch((err) => {
+    }).catch((err: any) => {
       console.error('[Server] Error listing routes:', err);
     });
   } catch (error) {
