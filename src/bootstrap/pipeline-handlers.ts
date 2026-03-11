@@ -83,9 +83,14 @@ export const wirePipelineHandlers = (deps: PipelineHandlersDependencies): void =
     });
     
     try {
+      // IMPORTANTE: Usar o conversationId como está (pode ter @s.whatsapp.net ou não)
+      // O sendMessage() normaliza internamente, mas manter o formato original é mais seguro
       let phoneNumber = event.conversationId;
-      if (phoneNumber.includes('@')) {
-        phoneNumber = phoneNumber.split('@')[0];
+      
+      // Se não tiver @, adicionar @s.whatsapp.net (igual ao envio manual)
+      // Se já tiver @, manter como está
+      if (!phoneNumber.includes('@')) {
+        phoneNumber = `${phoneNumber}@s.whatsapp.net`;
       }
 
       // Log diagnóstico do estado do WhatsApp antes de enviar
@@ -95,10 +100,13 @@ export const wirePipelineHandlers = (deps: PipelineHandlersDependencies): void =
         traceId,
         preview: event.response.text.substring(0, 50),
         connectionStatus: debugStatus.status,
+        hasSocket: !!(whatsAppAdapter as any).socket,
+        hasUser: !!(whatsAppAdapter as any).socket?.user,
       });
 
       // Enviar diretamente — sendMessage() valida o socket internamente
       // Se não estiver conectado, lança erro e o catch abaixo captura
+      // NÃO fazer verificação prévia - deixar sendMessage() validar (igual ao envio manual)
       const messageId = await whatsAppAdapter.sendMessage(phoneNumber, event.response.text);
       
       // Marcar como enviado APÓS sucesso
