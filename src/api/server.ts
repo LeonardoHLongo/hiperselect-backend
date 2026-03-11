@@ -39,11 +39,15 @@ export const createServer = async (deps: ServerDependencies): Promise<FastifyIns
   });
 
   // Registrar CORS
-  await fastify.register(cors, {
-    origin: true, // Permite todas as origens (em produção, especifique as origens permitidas)
-    credentials: true,
-  });
-  console.log('[Server] CORS registered');
+  // Se CORS_ORIGIN estiver definido, usar apenas essa origem (produção)
+  // Se não, permitir todas as origens (desenvolvimento)
+  const corsOrigin = process.env.CORS_ORIGIN;
+  const corsConfig = corsOrigin 
+    ? { origin: corsOrigin.split(',').map(o => o.trim()), credentials: true } // Múltiplas origens separadas por vírgula
+    : { origin: true, credentials: true }; // Desenvolvimento: permite todas
+  
+  await fastify.register(cors, corsConfig);
+  console.log('[Server] CORS registered', corsOrigin ? `(allowed origins: ${corsOrigin})` : '(all origins allowed)');
 
   // Registrar middleware de autenticação (exceto para /health e SSE)
   fastify.addHook('onRequest', async (request, reply) => {
