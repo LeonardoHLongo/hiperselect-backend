@@ -7,6 +7,7 @@ export interface IMessageRepository {
   findById(messageId: string, tenantId: string): Message | null | Promise<Message | null>;
   create(message: Message, tenantId: string): void | Promise<void>;
   getAllConversations(tenantId: string): Conversation[] | Promise<Conversation[]>;
+  getConversationsByIds(conversationIds: string[], tenantId: string): Conversation[] | Promise<Conversation[]>; // Buscar múltiplas conversas por IDs (batch)
   getConversationTenantId(conversationId: string): string | null | Promise<string | null>; // Buscar tenantId da conversa
   updateConversationSender(conversationId: string, sender: { phoneNumber: string; jid: string; pushName?: string }, tenantId: string): void | Promise<void>;
   markConversationAsRead(conversationId: string, tenantId: string): void | Promise<void>;
@@ -203,6 +204,17 @@ class InMemoryMessageRepository implements IMessageRepository {
     return Array.from(this.conversations.values()).sort(
       (a, b) => b.updatedAt - a.updatedAt // Ordenar por updatedAt (mais recente primeiro)
     );
+  }
+
+  getConversationsByIds(conversationIds: string[], tenantId: string): Conversation[] {
+    const conversations: Conversation[] = [];
+    conversationIds.forEach(id => {
+      const conv = this.conversations.get(id);
+      if (conv) {
+        conversations.push(conv);
+      }
+    });
+    return conversations;
   }
 
   markConversationAsRead(conversationId: string, tenantId: string): void {

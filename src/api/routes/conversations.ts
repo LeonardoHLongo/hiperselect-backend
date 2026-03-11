@@ -102,6 +102,49 @@ export const registerConversationRoutes = (
     }
   });
 
+  // GET /api/v1/conversations/batch - Buscar múltiplas conversas por IDs (otimização para evitar N+1)
+  fastify.post('/api/v1/conversations/batch', async (request, reply) => {
+    try {
+      const tenantId = request.tenantId;
+      if (!tenantId) {
+        return reply.code(401).send({
+          success: false,
+          message: 'TenantId is required',
+          errorCode: 'UNAUTHORIZED',
+        });
+      }
+
+      const body = request.body as { ids?: string[] };
+      if (!body.ids || !Array.isArray(body.ids) || body.ids.length === 0) {
+        return reply.code(400).send({
+          success: false,
+          message: 'ids array is required',
+          errorCode: 'INVALID_INPUT',
+        });
+      }
+
+      // Limitar a 100 conversas por request para evitar queries muito grandes
+      const conversationIds = body.ids.slice(0, 100);
+      const conversations = await messageService.getConversationsByIds(conversationIds, tenantId);
+
+      // Não buscar fotos de perfil aqui - deixar o frontend fazer sob demanda se necessário
+      // Isso acelera muito a resposta
+
+      return {
+        success: true,
+        data: conversations,
+      };
+    } catch (error) {
+      console.error('[API] Error fetching conversations batch:', error);
+      return reply.code(500).send({
+        success: false,
+        message: 'Failed to fetch conversations',
+        errorCode: 'INTERNAL_ERROR',
+        data: [],
+      });
+    }
+  });
+
   fastify.get('/api/v1/conversations/:id', async (request, reply) => {
     try {
       const { id } = request.params as { id: string };

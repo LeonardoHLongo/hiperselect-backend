@@ -228,6 +228,48 @@ class PostgresMessageRepository implements IMessageRepository {
     }
   }
 
+  async getConversationsByIds(conversationIds: string[], tenantId: string): Promise<Conversation[]> {
+    try {
+      if (conversationIds.length === 0) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from('conversations')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .in('id', conversationIds);
+
+      if (error) {
+        console.error('[PostgresMessageRepository] Error fetching conversations by IDs:', error);
+        return [];
+      }
+
+      if (!Array.isArray(data)) {
+        console.warn('[PostgresMessageRepository] Data is not an array:', data);
+        return [];
+      }
+
+      // Mapear conversas e manter ordem dos IDs solicitados
+      const conversationsMap = new Map<string, Conversation>();
+      const conversations = await Promise.all(
+        data.map((row) => this.mapRowToConversation(row, tenantId))
+      );
+      
+      conversations.forEach(conv => {
+        conversationsMap.set(conv.conversationId, conv);
+      });
+
+      // Retornar na ordem dos IDs solicitados
+      return conversationIds
+        .map(id => conversationsMap.get(id))
+        .filter((conv): conv is Conversation => conv !== undefined);
+    } catch (error) {
+      console.error('[PostgresMessageRepository] ❌ Error in getConversationsByIds:', error);
+      return [];
+    }
+  }
+
   async updateConversationSender(
     conversationId: string,
     sender: { phoneNumber: string; jid: string; pushName?: string },

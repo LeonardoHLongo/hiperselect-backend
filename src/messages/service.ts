@@ -38,6 +38,15 @@ export class MessageService {
     return conversations.find((c) => c.conversationId === conversationId) || null;
   }
 
+  async getConversationsByIds(conversationIds: string[], tenantId?: string): Promise<Conversation[]> {
+    const finalTenantId = tenantId || this.defaultTenantId;
+    if (!finalTenantId) {
+      throw new Error('TenantId is required. Either provide it explicitly or set a default tenant.');
+    }
+    const result = this.repository.getConversationsByIds(conversationIds, finalTenantId);
+    return result instanceof Promise ? await result : result;
+  }
+
   async getMessagesByConversationId(conversationId: string, tenantId?: string, limit?: number): Promise<Message[]> {
     const finalTenantId = tenantId || this.defaultTenantId;
     if (!finalTenantId) {
